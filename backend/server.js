@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import authRoutes from './routes/auth.routes.js';
 import categoryRoutes from './routes/category.routes.js';
+import productRoutes from './routes/product.routes.js';
 
 dotenv.config();
 
@@ -17,10 +18,18 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/products', productRoutes);
 
-//Health Check 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Inventory Management API is healthy' });
+});
+
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(err.statusCode || 500).json({
+    success: false,
+    message: err.message || 'Internal Server Error',
+  });
 });
 
 
