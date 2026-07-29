@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const Navbar = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
       return document.documentElement.classList.contains('light-theme') ? 'light' : 'dark';
@@ -18,11 +23,16 @@ const Navbar = () => {
     }
   };
 
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
+
   return (
     <nav className="navbar" id="main-navbar">
-      <div className="navbar-brand" id="navbar-logo">
+      <Link to={user ? "/dashboard" : "/"} className="navbar-brand" id="navbar-logo" style={{ textDecoration: 'none' }}>
         Invenflow
-      </div>
+      </Link>
       <div className="navbar-actions">
         <button 
           className="btn-theme-toggle" 
@@ -42,13 +52,29 @@ const Navbar = () => {
             </svg>
           )}
         </button>
-        <button className="btn-login" id="btn-login">
-          Login
-        </button>
+        
+        {user ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <Link to="/dashboard" style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: 600, fontSize: '0.875rem' }}>
+              Dashboard
+            </Link>
+            <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+              Hi, {user.name}
+            </span>
+            <button className="btn-login" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        ) : (
+          <button className="btn-login" id="btn-login" onClick={() => navigate('/login')}>
+            Login
+          </button>
+        )}
       </div>
     </nav>
   );
 };
 
 export default Navbar;
+
 
